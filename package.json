@@ -3,5 +3,8 @@
   "main": "server.js",
   "dependencies": {
     "express": "^4.13.3"
+  },
+  "scripts": {
+    "nodemon": "nodemon -e 'html css js'"
   }
 }
