@@ -1,0 +1,38 @@
+<html>
+<head>
+  <meta name="viewport" content="initial-scale=1.0">
+  <meta charset="utf-8">
+
+  <title>Maply</title>
+
+  <link href="/public/style.css" rel="stylesheet">
+
+  <!-- use headjs for loading all scripts async -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.js"></script>
+  <script type="text/javascript">
+    // css to load
+    head.load('/public/style.css');
+
+    // javascript to load
+    head.load('//code.jquery.com/jquery-2.1.4.min.js',
+            '/socket.io/socket.io.js',
+            '/public/script.js');
+
+    var gmapsReady = false;
+    function initialize() {
+      gmapsReady = true;
+      if (typeof loadComplete != 'undefined') {
+        loadComplete();
+      }
+    }
+
+    // room name
+    var room = '{{room}}';
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?callback=initialize" async defer>
+  </script>
+</head>
+<body>
+  <div id="map"></div>
+</body>
+</html>

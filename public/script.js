@@ -1,9 +1,13 @@
 var allMarkers = [
-  {lat: -38.120624, lng: 144.231085, title: 'Bens Place'},
+  // {lat: -38.120624, lng: 144.231085, title: 'Bens Place'},
   {lat: -37.801097, lng: 144.956027, title: 'Kris\' Place'},
 ];
 
-function initMap() {
+if (gmapsReady) {
+  loadComplete();
+}
+
+function loadComplete() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: -37.813, lng: 144.962},
     zoom: 9,
@@ -17,7 +21,8 @@ function initMap() {
 
   // get current location if supported
   if (!!navigator.geolocation) {
-    navigator.geolocation.watchPosition(updateCurrentPosition, failGettingPosition, {timeout:60000});
+    navigator.geolocation.watchPosition(updateCurrentPosition, failGettingPosition, {timeout: 60000, enableHighAccuracy: true});
+    navigator.geolocation.getCurrentPosition(updateCurrentPosition, failGettingPosition);
   } else {
     alert('you suck! get a better browser');
   }
@@ -29,6 +34,8 @@ function updateCurrentPosition(position) {
   if (lastMarker) {
     lastMarker.setMap(null);
   }
+
+  socket.emit('update', {lat: position.coords.latitude, lng: position.coords.longitude});
 
   var newMarker = {lat: position.coords.latitude, lng: position.coords.longitude, title: 'Current Position'};
   allMarkers.push(newMarker);
@@ -63,3 +70,11 @@ function fitMapToMarkers(markersArr) {
   //  Fit these bounds to the map
   map.fitBounds(bounds);
 }
+
+var socket = io.connect();
+socket.emit('joinroom', {room: room});
+
+socket.on('update', function(data) {
+  console.log(data);
+  addMarker(data);
+});

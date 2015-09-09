@@ -5,13 +5,17 @@
 
   <title>Maply</title>
 
-  <link href="/public/style.css" rel="stylesheet">
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/headjs/1.0.3/head.load.min.js"></script>
+  <script type="text/javascript">
+    head.css('/public/style.css');
+  </script>
 </head>
 <body>
-  <div id="map"></div>
-  <script type="text/javascript" src="//code.jquery.com/jquery-2.1.4.min.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?callback=initMap"
-          async defer></script>
-  <script type="text/javascript" src="/public/script.js"></script>
+  <h1>Maply</h1>
+  <p>Enter the name of the room you would like to create:</p>
+  <form method='post' action='/createroom' />
+    <input type="text" name="roomname" placeholder="my awesome room"/>
+    <input type="submit" value="Create" />
+  </form>
 </body>
 </html>
