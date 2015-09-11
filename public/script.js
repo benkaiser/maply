@@ -1,23 +1,32 @@
-var allMarkers = [
-  // {lat: -38.120624, lng: 144.231085, title: 'Bens Place'},
-  {lat: -37.801097, lng: 144.956027, title: 'Kris\' Place'},
-];
+
+
+// list of markers to store. TODO make this a model
+var allMarkers = [];
 
 if (gmapsReady) {
   loadComplete();
 }
 
+
+var map, meIcon, themIcon;
 function loadComplete() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: -37.813, lng: 144.962},
     zoom: 9,
   });
 
-  for (var i in allMarkers) {
-    addMarker(allMarkers[i]);
-  }
+  // custom markers
+  meIcon = new google.maps.MarkerImage('/public/img/position.png',
+                  new google.maps.Size(40, 40),
+                  new google.maps.Point(0, 0),
+                  new google.maps.Point(20, 20),
+                  new google.maps.Size(30, 30));
 
-  fitMapToMarkers(allMarkers);
+  themIcon = new google.maps.MarkerImage('/public/img/marker.png',
+                  new google.maps.Size(40, 40),
+                  new google.maps.Point(0, 0),
+                  new google.maps.Point(20, 28),
+                  new google.maps.Size(30, 30));
 
   // get current location if supported
   if (!!navigator.geolocation) {
@@ -28,20 +37,39 @@ function loadComplete() {
   }
 }
 
-var lastMarker = null;
+var thisMarker = null;
+var firstTime = true;
 function updateCurrentPosition(position) {
-  // if we have a previous marker for our position, null the map (remove it)
-  if (lastMarker) {
-    lastMarker.setMap(null);
+  // for use throughout this function
+  var lat = position.coords.latitude;
+  var lng = position.coords.longitude;
+
+  var markerInfo = {lat: lat, lng: lng, type: 'self', id: 'THIS'};
+
+  // if this is our first update, join the room
+  if (firstTime) {
+    // join the room once we have a location for our device
+    socket.emit('joinroom', {room: room, lat: lat, lng: lng});
+
+    thisMarker = markerInfo;
+
+    // add the self marker to the list of markers
+    allMarkers.push(thisMarker);
+
+    // add it to the map and save the map reference into the marker
+    thisMarker.mapRef = addMarker(thisMarker);
+  } else {
+    // update the marker position
+    updateMarkerPosition(markerInfo);
+    socket.emit('update', {lat: lat, lng: lng});
   }
 
-  socket.emit('update', {lat: position.coords.latitude, lng: position.coords.longitude});
+  if (firstTime) {
+    // rescale the map
+    fitMapToMarkers(allMarkers);
 
-  var newMarker = {lat: position.coords.latitude, lng: position.coords.longitude, title: 'Current Position'};
-  allMarkers.push(newMarker);
-
-  // add it to the map and save the marker id
-  lastMarker = addMarker(newMarker);
+    firstTime = false;
+  }
 }
 
 function failGettingPosition(msg) {
@@ -53,8 +81,71 @@ function addMarker(info) {
   return new google.maps.Marker({
     position: {lat: info.lat, lng: info.lng},
     map: map,
-    title: info.title,
+    icon: (info.type && info.type == 'self') ? meIcon : themIcon,
+    title: (info.title) ? info.title : '',
   });
+}
+
+function getMarkerById(id) {
+  for (var i in allMarkers) {
+    if (allMarkers[i] && allMarkers[i].id == id) {
+      return allMarkers[i];
+    }
+  }
+
+  return null;
+}
+
+function updateMarkerPosition(data) {
+  var marker = getMarkerById(data.id);
+
+  if (marker) {
+    // update it's location
+    var latlng = new google.maps.LatLng(data.lat, data.lng);
+    marker.mapRef.setPosition(latlng);
+  } else {
+    // add it to the map / create it
+    allMarkers.push(data);
+
+    // update the reference
+    data.mapRef = addMarker(data);
+
+    // rescale the map
+    fitMapToMarkers(allMarkers);
+  }
+}
+
+// used for initially loading in all the other markers
+function setMarkersNotSelf(data) {
+  // clear all the current markers except current
+  for (var i in allMarkers) {
+    var item = allMarkers[i];
+
+    if (item.type != 'self') {
+      item.mapRef.setMap(null);
+      allMarkers.slice(i, 1);
+    }
+  }
+
+  for (var i in data) {
+    var item = data[i];
+
+    allMarkers.push(item);
+    item.mapRef = addMarker(item);
+  }
+
+  // refit all markers
+  fitMapToMarkers(allMarkers);
+}
+
+function removeMarkerFromMap(data) {
+  var marker = getMarkerById(data.id);
+
+  if (marker) {
+    // clear it from the map
+    marker.mapRef.setMap(null);
+    allMarkers.splice(allMarkers.indexOf(marker), 1);
+  }
 }
 
 function fitMapToMarkers(markersArr) {
@@ -72,9 +163,15 @@ function fitMapToMarkers(markersArr) {
 }
 
 var socket = io.connect();
-socket.emit('joinroom', {room: room});
 
 socket.on('update', function(data) {
-  console.log(data);
-  addMarker(data);
+  updateMarkerPosition(data);
+});
+
+socket.on('updateAllMarkers', function(data) {
+  setMarkersNotSelf(data.markers);
+});
+
+socket.on('remove', function(data) {
+  removeMarkerFromMap(data);
 });

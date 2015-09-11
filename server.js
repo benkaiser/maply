@@ -25,10 +25,10 @@ var main = function() {
   }));
 
   // add the routes
-  app.use('/', require('./service/httproutes').router);
+  app.use('/', require('./routers/httproutes').router);
 
   // add the websocket routes
-  require('./service/socketroutes')(app.io);
+  require('./routers/socketroutes')(app.io);
 
   // serving static files
   app.use('/public', express.static('public'));
