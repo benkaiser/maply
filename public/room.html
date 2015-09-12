@@ -15,9 +15,13 @@
 
     // javascript to load
     head.load('//code.jquery.com/jquery-2.1.4.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js',
             'https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.3/backbone-min.js',
             '/socket.io/socket.io.js',
-            '/public/script.js');
+            '/public/scripts/mapsview.js',
+            '/public/scripts/models.js',
+            '/public/scripts/socket.js',
+            '/public/scripts/init.js');
 
     // trigger the loadComplete method only if it's loaded
     var gmapsReady = false;

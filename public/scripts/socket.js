@@ -1,11 +1,13 @@
+var socket = io.connect();
+
 socket.on('update', function(data) {
-  updateMarkerPosition(data);
+  mapview.updateMarkerPosition(data);
 });
 
 socket.on('updateAllMarkers', function(data) {
-  setMarkersNotSelf(data.markers);
+  mapview.setMarkersNotSelf(data.markers);
 });
 
 socket.on('remove', function(data) {
-  removeMarkerFromMap(data);
+  mapview.removeMarkerFromMap(data);
 });

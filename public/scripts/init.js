@@ -4,13 +4,11 @@ if (gmapsReady) {
   loadComplete();
 }
 
-var map;
-var meIcon;
-var themIcon;
+window.markersCollection = new Markers();
 function loadComplete() {
 
   window.mapview = new MapView({id: 'map'});
+  window.mapview.render();
 
-  mapview.geoloate();
-
+  window.mapview.geolocate();
 }

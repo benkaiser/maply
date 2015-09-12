@@ -1,17 +1,6 @@
-var Marker = Backbone.Model.extend({
-  addToMap: function(map) {
-
-  },
-
-  removeFromMap: function() {
-
-  },
-});
+// schema isn't defined, they are initialised with objects sent over the socket
+var Marker = Backbone.Model.extend({});
 
 var Markers = Backbone.Collection.extend({
   model: Marker,
-
-  onModelRemoved: function(model, collection, options) {
-    model.removeFromMap();
-  },
 });
