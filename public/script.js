@@ -1,75 +1,10 @@
-
-
 // list of markers to store. TODO make this a model
 var allMarkers = [];
-
-if (gmapsReady) {
-  loadComplete();
-}
-
-
-var map, meIcon, themIcon;
-function loadComplete() {
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: -37.813, lng: 144.962},
-    zoom: 9,
-  });
-
-  // custom markers
-  meIcon = new google.maps.MarkerImage('/public/img/position.png',
-                  new google.maps.Size(40, 40),
-                  new google.maps.Point(0, 0),
-                  new google.maps.Point(20, 20),
-                  new google.maps.Size(30, 30));
-
-  themIcon = new google.maps.MarkerImage('/public/img/marker.png',
-                  new google.maps.Size(40, 40),
-                  new google.maps.Point(0, 0),
-                  new google.maps.Point(20, 28),
-                  new google.maps.Size(30, 30));
-
-  // get current location if supported
-  if (!!navigator.geolocation) {
-    navigator.geolocation.watchPosition(updateCurrentPosition, failGettingPosition, {timeout: 60000, enableHighAccuracy: true});
-    navigator.geolocation.getCurrentPosition(updateCurrentPosition, failGettingPosition);
-  } else {
-    alert('you suck! get a better browser');
-  }
-}
 
 var thisMarker = null;
 var firstTime = true;
 function updateCurrentPosition(position) {
-  // for use throughout this function
-  var lat = position.coords.latitude;
-  var lng = position.coords.longitude;
-
-  var markerInfo = {lat: lat, lng: lng, type: 'self', id: 'THIS'};
-
-  // if this is our first update, join the room
-  if (firstTime) {
-    // join the room once we have a location for our device
-    socket.emit('joinroom', {room: room, lat: lat, lng: lng});
-
-    thisMarker = markerInfo;
-
-    // add the self marker to the list of markers
-    allMarkers.push(thisMarker);
-
-    // add it to the map and save the map reference into the marker
-    thisMarker.mapRef = addMarker(thisMarker);
-  } else {
-    // update the marker position
-    updateMarkerPosition(markerInfo);
-    socket.emit('update', {lat: lat, lng: lng});
-  }
-
-  if (firstTime) {
-    // rescale the map
-    fitMapToMarkers(allMarkers);
-
-    firstTime = false;
-  }
+  
 }
 
 function failGettingPosition(msg) {
@@ -161,17 +96,3 @@ function fitMapToMarkers(markersArr) {
   //  Fit these bounds to the map
   map.fitBounds(bounds);
 }
-
-var socket = io.connect();
-
-socket.on('update', function(data) {
-  updateMarkerPosition(data);
-});
-
-socket.on('updateAllMarkers', function(data) {
-  setMarkersNotSelf(data.markers);
-});
-
-socket.on('remove', function(data) {
-  removeMarkerFromMap(data);
-});
