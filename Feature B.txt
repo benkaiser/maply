@@ -1,0 +1,3 @@
+Feature B- Group 1
+
+For part 3, you will design and implement a feature that allows room owners to merge rooms. Room owner must be able to send a room merging request which must be approved by the other room's owner. Requests can be withdrawn at any time and rooms do not merge even if the 2nd room owner accepted the request. Room owner can write short comments about the room. Comments cannot be modified or deleted by Owners, but they can send request to the admin to modify or deleted them.  
