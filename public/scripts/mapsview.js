@@ -2,12 +2,6 @@ var meIcon;
 var themIcon;
 
 var MapView = Backbone.View.extend({
-  events: {
-    // "click .icon":          "open",
-    // "click .button.edit":   "openEditDialog",
-    // "click .button.delete": "destroy"
-  },
-
   initialize: function() {
     // create the custom markers for use in the map later
     meIcon = new google.maps.MarkerImage('/public/img/position.png',

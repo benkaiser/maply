@@ -16,6 +16,9 @@ module.exports = {
       // insert the current new marker
       data.id = socket.id;
       models.markers.addMarker(data);
+
+      // let all the existing sockets know about the new sockets location
+      socketRoom(socket).emit('update', data);
     });
   },
 
@@ -36,10 +39,6 @@ module.exports = {
 
     // let the other clients know of it's removal
     socketRoom(socket).emit('remove', {id: socket.id});
-  },
-
-  getMarkersInRoom: function(socket, data) {
-
   },
 };
 
