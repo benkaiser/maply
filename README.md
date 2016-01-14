@@ -7,7 +7,7 @@ You'll want to create a room either by visiting that page and entering it, or ap
 
 Once your friend joins you'll both be able to see each other's location!
 
-![screenshot_20160113-182119](https://cloud.githubusercontent.com/assets/608054/12314063/9bfe3f1c-ba22-11e5-984d-7ee12433c752.png)
+![screenshot_20160113-182119_small](https://cloud.githubusercontent.com/assets/608054/12314184/75ff3572-ba23-11e5-8f5f-182133b47dd4.png)
 
 ## Installation
 
